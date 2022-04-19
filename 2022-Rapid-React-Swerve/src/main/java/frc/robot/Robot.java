@@ -20,6 +20,17 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  // Xbox controller
+  // We'll have to do some translating here to use the Sparky 
+  // Controller class, but this will work for now.
+  private final XboxController m_controller = new XboxController(0);
+  private final Drivetrain m_swerve = new Drivetrain();
+
+  // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -89,8 +100,30 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}  
 
   private void driveWithJoystick(boolean fieldRelative) {
-    // Get the x speed.  We are inverting this because Xbox controllers
-    // return negative values when we push forward. 
+    // Get the x speed, or forward/reverse speed.  We are inverting this because 
+    // Xbox controllers return negative values when we push forward.  The slew
+    // rate limiter is also applied.
+    final var xSpeed = -m_xspeedLimiter.calculate(m_controller.getY(GenericHID.Hand.kLeft))
+    * edu.wpi.first.wpilibj.examples.mecanumbot.Drivetrain.kMaxSpeed;
+
+    // Get the y speed or sideways/strafe speed. We are inverting this because
+    // we want a positive value when we pull to the left. Xbox controllers
+    // return positive values when you pull to the right by default. The slew
+    // rate limiter is also applied.
+    final var ySpeed =
+        -m_yspeedLimiter.calculate(m_controller.getX(GenericHID.Hand.kLeft))
+            * edu.wpi.first.wpilibj.examples.mecanumbot.Drivetrain.kMaxSpeed;
+
+    // Get the rate of angular rotation. We are inverting this because we want a
+    // positive value when we pull to the left (remember, CCW is positive in
+    // mathematics). Xbox controllers return positive values when you pull to
+    // the right by default. The slew rate limiter is also applied.
+    final var rot =
+        -m_rotLimiter.calculate(m_controller.getX(GenericHID.Hand.kRight))
+            * edu.wpi.first.wpilibj.examples.mecanumbot.Drivetrain.kMaxAngularSpeed;
+
+    // This is the actual drive in teleop
+    m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
   }
 }
 
