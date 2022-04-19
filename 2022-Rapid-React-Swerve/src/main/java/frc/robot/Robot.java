@@ -74,6 +74,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    driveWithJoystick(false);
+
     switch (m_autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
@@ -91,7 +93,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    driveWithJoystick(true);
+
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
