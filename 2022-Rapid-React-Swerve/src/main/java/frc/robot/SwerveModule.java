@@ -26,6 +26,7 @@ public class SwerveModule {
   private final CANCoder turningEncoder;
   private final boolean turningEncoderReversed;
   private final double turningEncoderOffsetRad;
+  private final PIDController turningPIDController;
   
   
   // The driving PID controller with P gain only (kP, kI, kD)
@@ -75,6 +76,31 @@ public class SwerveModule {
       
     driveMotor.setInverted(driveMotorReversed);
     turningMotor.setInverted(turningMotorReversed);
+    
+    // This is the drive motor encoder
+    driveMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+    //driveMotor.setSensorPhase(true);
+    // Turning motor encoder
+    turningMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+    //turningMotor.setSensorPhase(true);
+
+    /*
+    Encoder conversion constants
+
+    This is not compatible with the Falcon motor as the below values are not supported
+    in the motor class, as it is with the Spark Max.  I might create a new class with
+    the WPI_TalonFX base class, and add these features.  That would be Java cool. 
+    */
+    //driveEncoder.setPositionConversionFactor(Constants.kDriveEncoderRot2Meter);
+    //driveEncoder.setVelocityConversionFactor(Constants.kDriveEncoderRPM2MeterPerSec);
+    //turningEncoder.setPositionConversionFactor(Constants.kTurningEncoderRot2Rad);
+    //turningEncoder.setVelocityConversionFactor(Constants.kTurningEncoderRPM2RadPerSec);
+
+    // Initialized using P gain only
+    turningPIDController = new PIDController(Constants.kPTurning, 0, 0);
+    // Limit the PID Controller's input range between -pi and pi and set the input
+    // to be continuous.
+    turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
     //m_driveMotor = new PWMSparkMax(driveMotorChannel);
     //m_driveMotor = new WPI_TalonFX(driveMotorChannel);
@@ -96,5 +122,30 @@ public class SwerveModule {
     //m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
+  // Return drive position in meters
+  // This is where the conversion must be done
+  public double getDrivePosition()  {
+    double distance = 
+    (driveMotor.getSelectedSensorPosition() * Constants.kDriveEncoderRot2Meter)
+    / Constants.kEncoderResolution;
+    
+    return (distance);
+  }
+
+  public double getTurningPosition()  {
+    return 0.0;
+  }
+
+  public double getDriveVelocity()  {
+    return 0.0;
+  }
+
+  public double getTurningVelocity()  {
+    return 0.0;
+  }
+
+  public double getAbsoluteEncoderRad() {
+    return 0.0;
+  }
     
 }
