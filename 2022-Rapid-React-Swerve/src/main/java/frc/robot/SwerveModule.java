@@ -1,29 +1,27 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
-//import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.MotorController;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.controller.PIDController;
+//import edu.wpi.first.wpilibj.MotorController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
-
 
 public class SwerveModule {
     
   private final WPI_TalonFX driveMotor;
   private final WPI_TalonFX turningMotor;
-  private final PIDController turningPIDController;
+  //private final PIDController turningPIDController;
   // The  motor encoder is part of the TalonFX
   private final CANCoder turningEncoder;
   private final boolean turningEncoderReversed;
@@ -71,7 +69,7 @@ public class SwerveModule {
     this.turningEncoderOffsetRad = absoluteEncoderOffset;
     this.turningEncoderReversed = absoluteEncoderReversed;
       
-    turningEncoder = new CANCoder;
+    turningEncoder = new CANCoder(absoluteEncoderId);
     driveMotor = new WPI_TalonFX(driveMotorId);
     turningMotor = new WPI_TalonFX(turningMotorId);
       
