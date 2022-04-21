@@ -137,7 +137,9 @@ public class SwerveModule {
   }
 
   public double getDriveVelocity()  {
-    return 0.0;
+    double angle = 
+      (turningMotor.getSelectedSensorPosition()/Constants.kTurningMotorGearRatio)/Constants.kEncoderResolution * 2 * Math.PI;
+    return angle;
   }
 
   public double getTurningVelocity()  {
