@@ -63,6 +63,7 @@ public class SwerveModule {
  *
  * @param driveMotorId ID for the drive motor.
  * @param turningMotorId ID for the turning motor.
+ * @param absoluteEncoderId ID for the absolute turning encoder (CANCODER).
  */
   public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed, 
     int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
@@ -133,21 +134,31 @@ public class SwerveModule {
   }
 
   public double getTurningPosition()  {
-    return 0.0;
-  }
-
-  public double getDriveVelocity()  {
     double angle = 
       (turningMotor.getSelectedSensorPosition()/Constants.kTurningMotorGearRatio)/Constants.kEncoderResolution * 2 * Math.PI;
     return angle;
+    
+  }
+
+  public double getDriveVelocity()  {
+    double velocity = 
+    (driveMotor.getSelectedSensorVelocity() * 10 * Constants.kDriveMotorGearRatio * Math.PI * Constants.kWheelDiameterMeters) / 2048;
+    
+    return velocity;
   }
 
   public double getTurningVelocity()  {
-    return 0.0;
+    double velocity = 
+      (turningMotor.getSelectedSensorVelocity() * 10 * Constants.kTurningMotorGearRatio * 2 * Math.PI) / 2048;
+    
+    return velocity;
   }
 
   public double getAbsoluteEncoderRad() {
-    return 0.0;
+    // Configure the Encoder to return position in -180 to +180 degrees, (0 to 360) by default
+    double angle = turningEncoder.getAbsolutePosition() * (Math.PI/180);
+    
+    return angle;
   }
     
 }
