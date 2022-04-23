@@ -53,7 +53,14 @@ public class Drivetrain {
         Constants.kBackRightDriveAbsoluteEncoderReversed);
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(Constants.kDriveKinematics, new Rotation2d(0));
+    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
+    
+    public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+        new Translation2d(Constants.kWheelBase/2, -Constants.kTrackWidth/2),
+        new Translation2d(Constants.kWheelBase/2, Constants.kTrackWidth/2),
+        new Translation2d(-Constants.kWheelBase/2, -Constants.kTrackWidth/2),
+        new Translation2d(-Constants.kWheelBase/2, Constants.kTrackWidth/2)
+    );
 
     public void zeroHeading()   {
         gyro.reset();
@@ -91,6 +98,7 @@ public class Drivetrain {
         backRight.stop();
     }
 
+    /*
     public void setModuleStates(SwerveModuleState[] desiredStates)  {
         //SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Constants.kPhysicalMaxSpeedMetersPerSecond);
         // They changed the name from normaize to desaturate - really???
@@ -100,4 +108,22 @@ public class Drivetrain {
         backLeft.setDesiredState(desiredStates[2]);
         frontRight.setDesiredState(desiredStates[3]);
     }
+    */
+
+    // This is from wpilib swervebot, and needs some tweaking to work
+    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+        // Need to translate this section
+        var swerveModuleStates =
+            kinematics.toSwerveModuleStates(
+                fieldRelative
+                    ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
+                    : new ChassisSpeeds(xSpeed, ySpeed, rot));
+        
+        // We are already doing this in setModuleStates
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
+        frontLeft.setDesiredState(swerveModuleStates[0]);
+        frontRight.setDesiredState(swerveModuleStates[1]);
+        backLeft.setDesiredState(swerveModuleStates[2]);
+        backRight.setDesiredState(swerveModuleStates[3]);
+      }
 }

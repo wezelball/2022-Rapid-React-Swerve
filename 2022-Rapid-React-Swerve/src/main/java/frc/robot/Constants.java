@@ -24,13 +24,6 @@ public class Constants {
     // Drive kinematics
     public static final double kTrackWidth = Units.inchesToMeters(21.0);
     public static final double kWheelBase = Units.inchesToMeters(21.0);
-    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-        new Translation2d(kWheelBase/2, -kTrackWidth/2),
-        new Translation2d(kWheelBase/2, kTrackWidth/2),
-        new Translation2d(-kWheelBase/2, -kTrackWidth/2),
-        new Translation2d(-kWheelBase/2, kTrackWidth/2)
-    );
-    
     
     // Individual swerve module parameters
     // Front left
