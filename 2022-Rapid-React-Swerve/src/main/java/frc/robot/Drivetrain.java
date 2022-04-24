@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+//import edu.wpi.first.math.kinematics.SwerveModuleState;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -53,6 +53,7 @@ public class Drivetrain {
         Constants.kBackRightDriveAbsoluteEncoderReversed);
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
+    
     private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
     
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
@@ -83,7 +84,7 @@ public class Drivetrain {
         odometer.resetPosition(pose, getRotation2d());
     }
 
-    public void update() {
+    public void updateOdometry() {
         odometer.update
             (getRotation2d(), frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState());
         

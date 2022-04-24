@@ -1,19 +1,19 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Encoder;
+//import edu.wpi.first.wpilibj.Encoder;
 //import edu.wpi.first.wpilibj.MotorController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+//import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+//import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI;
+//import com.kauailabs.navx.frc.AHRS;
+//import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
@@ -33,6 +33,9 @@ public class SwerveModule {
  * @param driveMotorId ID for the drive motor.
  * @param turningMotorId ID for the turning motor.
  * @param absoluteEncoderId ID for the absolute turning encoder (CANCODER).
+ *
+ * Note that the absolute encoder can be reversed in Phoenix Tuner
+ * We can also set the encoder offset in the tuner 
  */
   public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed, 
     int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
@@ -60,8 +63,8 @@ public class SwerveModule {
     // to be continuous.
     turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
-    // Need to write this
-    // resetEncoders();
+    // Check t make sure that it works
+    resetEncoders();
   }
 
   // Return drive position in meters
@@ -74,6 +77,9 @@ public class SwerveModule {
     return (distance);
   }
 
+  // Return turning angle in radians
+  // angle should range from -2*PI to +2*PI
+  // This is for the turning motor's encoder
   public double getTurningPosition()  {
     double angle = 
       (turningMotor.getSelectedSensorPosition()/Constants.kTurningMotorGearRatio)/Constants.kEncoderResolution * 2 * Math.PI;
@@ -81,6 +87,7 @@ public class SwerveModule {
     
   }
 
+  // Return drive velocity in meters/second
   public double getDriveVelocity()  {
     double velocity = 
     (driveMotor.getSelectedSensorVelocity() * 10 * Constants.kDriveMotorGearRatio * Math.PI * Constants.kWheelDiameterMeters) / 2048;
@@ -88,6 +95,8 @@ public class SwerveModule {
     return velocity;
   }
 
+  // Return turning velocity in radians/second
+  // This is for the turning motor's encoder
   public double getTurningVelocity()  {
     double velocity = 
       (turningMotor.getSelectedSensorVelocity() * 10 * Constants.kTurningMotorGearRatio * 2 * Math.PI) / 2048;
@@ -97,6 +106,7 @@ public class SwerveModule {
 
   public double getAbsoluteEncoderRad() {
     // Configure the Encoder to return position in -180 to +180 degrees, (0 to 360) by default
+    // This is done during setup in Phoenix Tuner
     double angle = absoluteEncoder.getAbsolutePosition() * (Math.PI/180);
     angle -= absoluteEncoderOffsetRad;
     
